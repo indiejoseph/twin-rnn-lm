@@ -44,7 +44,7 @@ def generate_experiment_fn(train_file, eval_file, vocab_size, batch_size, num_ep
     eval_metrics = {
         'accuracy': tf.contrib.learn.MetricSpec(metric_fn=tf.metrics.accuracy,
                                                 prediction_key='prediction',
-                                                label_key='target')
+                                                label_key='targets')
     }
 
     serving_input_fn = generate_serving_input_fn()

@@ -96,8 +96,9 @@ class TwinRNN(object):
       l2_loss = tf.nn.l2_loss(affine_transformation - bw_flatted_states)
 
     loss = fw_loss + bw_loss + l2_loss
+    perplexity = tf.exp(tf.reduce_mean(loss), name='perplexity')
 
-    return tf.reduce_mean(loss)
+    return tf.reduce_mean(loss), perplexity
 
 def get_train_op(loss, params, mode):
   """
@@ -133,7 +134,7 @@ def model_fn(features, targets, mode, params):
   model = TwinRNN(params, (mode == tf.contrib.learn.ModeKeys.TRAIN))
   fw_logits, bw_logits, fw_states, bw_states = model.get_logits(inputs)
   predictions = model.get_predictions(fw_logits)
-  loss = model.get_loss(fw_logits, bw_logits, fw_states, bw_states, targets, mode)
+  loss, perplexity = model.get_loss(fw_logits, bw_logits, fw_states, bw_states, targets, mode)
   train_op = get_train_op(loss, params, mode)
 
   return tf.contrib.learn.ModelFnOps(predictions=predictions,
@@ -158,6 +159,6 @@ if __name__ == '__main__':
 
   model = TwinRNN(params, mode=tf.contrib.learn.ModeKeys.TRAIN)
   fw_logits, bw_logits, fw_states, bw_states = model.get_logits(inputs)
-  loss = model.get_loss(fw_logits, bw_logits, fw_states, bw_states, targets)
+  loss, perplexity = model.get_loss(fw_logits, bw_logits, fw_states, bw_states, targets)
 
   print(loss)
